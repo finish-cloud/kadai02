@@ -63,36 +63,46 @@ def main():
     driver.find_element_by_class_name("topSearch__button").click()
 
     # ページ終了まで繰り返し取得
-    exp_name_list = []
-    exp_copy_list = []
-    exp_status_list = []
-    exp_first_year_fee_list = []
-    # 検索結果の一番上の会社名を取得
-    name_list = driver.find_elements_by_css_selector(
-        ".cassetteRecruit__heading .cassetteRecruit__name")
-    copy_list = driver.find_elements_by_css_selector(
-        ".cassetteRecruit__heading .cassetteRecruit__copy")
-    status_list = driver.find_elements_by_css_selector(
-        ".cassetteRecruit__heading .labelEmploymentStatus")
-    table_list = driver.find_elements_by_css_selector(
-        ".cassetteRecruit .tableCondition")  # 初年度年収
-    # 1ページ分繰り返し
-    print(len(name_list))
-    print(len(copy_list))
-    print(len(status_list))
-    print(len(table_list))
-    for name, copy, status, table in zip(name_list, copy_list, status_list, table_list):
-        exp_name_list.append(name.text)
-        exp_copy_list.append(copy.text)
-        exp_status_list.append(status.text)
-        # 初年度年収をtableから探す
-        first_year_fee = find_table_target_word(table.find_elements_by_tag_name(
-            "th"), table.find_elements_by_tag_name("td"), "初年度年収")
-        exp_first_year_fee_list.append(first_year_fee)
-        print(name.text)
-        print(copy.text)
-        print(status.text)
-        print(first_year_fee)
+    while True:
+        exp_name_list = []
+        exp_copy_list = []
+        exp_status_list = []
+        exp_first_year_fee_list = []
+        # 検索結果の一番上の会社名を取得
+        name_list = driver.find_elements_by_css_selector(
+            ".cassetteRecruit__heading .cassetteRecruit__name")
+        copy_list = driver.find_elements_by_css_selector(
+            ".cassetteRecruit__heading .cassetteRecruit__copy")
+        status_list = driver.find_elements_by_css_selector(
+            ".cassetteRecruit__heading .labelEmploymentStatus")
+        table_list = driver.find_elements_by_css_selector(
+            ".cassetteRecruit .tableCondition")  # 初年度年収
+        # 1ページ分繰り返し
+        print(len(name_list))
+        print(len(copy_list))
+        print(len(status_list))
+        print(len(table_list))
+        for name, copy, status, table in zip(name_list, copy_list, status_list, table_list):
+            exp_name_list.append(name.text)
+            exp_copy_list.append(copy.text)
+            exp_status_list.append(status.text)
+            # 初年度年収をtableから探す
+            first_year_fee = find_table_target_word(table.find_elements_by_tag_name(
+                "th"), table.find_elements_by_tag_name("td"), "初年度年収")
+            exp_first_year_fee_list.append(first_year_fee)
+            print(name.text)
+            print(copy.text)
+            print(status.text)
+            print(first_year_fee)
+
+            # 次のページボタンがあればクリックなければ終了
+        next_page = driver.find_elements_by_class_name("iconFont--arrowLeft")
+        if len(next_page) >= 1:
+            next_page_link = next_page[0].get_attribute("href")
+            driver.get(next_page_link)
+        else:
+            log("最終ページです。終了します。")
+            break
 
 
 # 直接起動された場合はmain()を起動(モジュールとして呼び出された場合は起動しないようにするため)
