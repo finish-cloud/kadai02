@@ -45,12 +45,12 @@ def main():
         driver = set_driver("chromedriver", False)
     # Webサイトを開く
     driver.get("https://tenshoku.mynavi.jp/")
-    time.sleep(5)
+    time.sleep(10)
 
     try:
         # ポップアップを閉じる
         driver.execute_script('document.querySelector(".karte-close").click()')
-        time.sleep(5)
+        time.sleep(10)
         # ポップアップを閉じる
         driver.execute_script('document.querySelector(".karte-close").click()')
     except:
@@ -78,31 +78,37 @@ def main():
         table_list = driver.find_elements_by_css_selector(
             ".cassetteRecruit .tableCondition")  # 初年度年収
         # 1ページ分繰り返し
-        print(len(name_list))
-        print(len(copy_list))
-        print(len(status_list))
-        print(len(table_list))
-        for name, copy, status, table in zip(name_list, copy_list, status_list, table_list):
-            exp_name_list.append(name.text)
-            exp_copy_list.append(copy.text)
-            exp_status_list.append(status.text)
-            # 初年度年収をtableから探す
-            first_year_fee = find_table_target_word(table.find_elements_by_tag_name(
-                "th"), table.find_elements_by_tag_name("td"), "初年度年収")
-            exp_first_year_fee_list.append(first_year_fee)
-            print(name.text)
-            print(copy.text)
-            print(status.text)
-            print(first_year_fee)
 
-            # 次のページボタンがあればクリックなければ終了
-        next_page = driver.find_elements_by_class_name("iconFont--arrowLeft")
+        for name, copy, status, table in zip(name_list, copy_list, status_list, table_list):
+            try:
+                exp_name_list.append(name.text)
+                exp_copy_list.append(copy.text)
+                exp_status_list.append(status.text)
+                # 初年度年収をtableから探す
+                first_year_fee = find_table_target_word(table.find_elements_by_tag_name(
+                    "th"), table.find_elements_by_tag_name("td"), "初年度年収")
+                exp_first_year_fee_list.append(first_year_fee)
+            except Exception as e:
+                print(e)
+
+                # 次のページボタンがあればクリックなければ終了
+        next_page = driver.find_elements_by_class_name(
+            "iconFont--arrowLeft")
         if len(next_page) >= 1:
             next_page_link = next_page[0].get_attribute("href")
             driver.get(next_page_link)
         else:
-            log("最終ページです。終了します。")
+            print("最終ページです。終了します。")
             break
+
+        # CSV出力
+        df = pd.DataFrame({"企業名": exp_name_list,
+                           "キャッチコピー": exp_copy_list,
+                           "ステータス": exp_status_list,
+                           "初年度年収": exp_first_year_fee_list})
+        df.to_csv('求人情報.csv', index=False, encoding="utf-8-sig")
+        driver.quit()
+        return False
 
 
 # 直接起動された場合はmain()を起動(モジュールとして呼び出された場合は起動しないようにするため)
