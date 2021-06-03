@@ -4,7 +4,7 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 import time
 import datetime
 import pandas as pd
-
+from webdriver_manager.chrome import ChromeDriverManager
 
 LOG_FILE_PATH = "./log/log_{datetime}.log"
 EXP_CSV_PATH = "./exp_list_{search_keyword}_{datetime}.csv"
@@ -31,7 +31,7 @@ def set_driver(driver_path, headless_flg):
     options.add_argument('--incognito')          # シークレットモードの設定を付与
 
     # ChromeのWebDriverオブジェクトを作成する。
-    return Chrome(executable_path=os.getcwd() + "/" + driver_path, options=options)
+    return Chrome(ChromeDriverManager().install(), options=options)
 
 
 # ログファイルおよびコンソール出力
