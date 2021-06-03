@@ -60,7 +60,7 @@ def main():
     # driverを起動
     driver = set_driver("chromedriver.exe", False)
     # Webサイトを開く
-    driver.get("https://tenshoku.mynavi.jp/")
+    driver.get("https://tenshoku.mynavi.jp/list/kw" + search_keyword + "/")
     time.sleep(5)
     try:
         # ポップアップを閉じる（seleniumだけではクローズできない）
@@ -70,12 +70,6 @@ def main():
         driver.execute_script('document.querySelector(".karte-close").click()')
     except:
         pass
-
-    # 検索窓に入力
-    driver.find_element_by_class_name(
-        "topSearch__text").send_keys(search_keyword)
-    # 検索ボタンクリック
-    driver.find_element_by_class_name("topSearch__button").click()
 
     # ページ終了まで繰り返し取得
     exp_name_list = []
